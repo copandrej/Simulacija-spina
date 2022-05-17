@@ -4,6 +4,7 @@
 \large Računalniške tehnologije}
 \usepackage{amsmath} 
 \usepackage{braket}
+\usepackage{listings}
 
 \author{Andrej Čop}
 \date{Maj 2022}
@@ -42,8 +43,34 @@ Obravnavamo gibanje spina v časovno spremenljivem polju. S pomočjo programa, k
 Predvidevam, da za dovolj majhen $T$ in $b$ (tj. T precej manjši od obhodnega časa), bo rezultat simulacije precesija spina v obliki spirale na \textit{Blochovi sferi}
 
 \section{Program za simuliranje}
-Za simuliranje uporabljam programski jezik \textit{python} in module \textit{numpy, matplotlib}, \textit{cmath}, ter za simuliranje kvantnih sistemov \textit{qutip}.
+Za simuliranje uporabljam programski jezik \textit{python} in module \textit{numpy, matplotlib}, \textit{cmath}, ter za simuliranje kvantnih sistemov \textit{qutip}.\\
+Najprej nastavimo parametre in bazne vektorje:
+\lstset{language=Python} 
+\begin{lstlisting}
+t = 0.05
+T = math.pi
+time = theta = phi = 0
+frekvenca = 1 
 
+upSpin = basis(2, 0)
+downSpin = basis(2, 1)
+
+plus = (upSpin + downSpin)/math.sqrt(2)  # | + >
+minus = (upSpin - downSpin)/math.sqrt(2)  # | - >
+\end{lstlisting}
+Funkcija za računanje vektorja v odvisnosti od časa (za poljubno bazo, kot parameter):
+\begin{lstlisting}
+def Psi(T, base1, base2, phi, theta):
+    scalar = (-1 * (1j) * (phi + frekvenca * T)) / 2
+    n = cmath.cos(theta / 2) * cmath.e ** scalar
+    base1 = base1 * n
+    scalar = ((1j * (phi + frekvenca * T)) / 2)
+    n = cmath.sin(theta / 2) * cmath.e ** scalar
+    base2 = base2 * n
+    vec = base2 + base1
+    return vec
+\end{lstlisting}
+Funkcijo poganjamo na majhnih časovnih intervalih in pri tem posodabljamo \textit{phi} in \textit{theta}: $\phi(t) = \phi + \omega_0t$
 \section{Rezultati simulacije}
 
 \section{Zaključek}
