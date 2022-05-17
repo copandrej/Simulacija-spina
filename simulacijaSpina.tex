@@ -2,6 +2,8 @@
 \usepackage[utf8]{inputenc}
 \title{  Domača naloga\\\large\textbf{Simulacija spina v časovno odvisnem polju}\\
 \large Računalniške tehnologije}
+\usepackage{amsmath} 
+\usepackage{braket}
 
 \author{Andrej Čop}
 \date{Maj 2022}
@@ -14,18 +16,38 @@
 \newpage
 
 \section{Uvod}
-V tej domači nalogi raziskujem splošno rešitev za gibanje spina v ploju v smeri \textit{x} in \textit{z}. Nato obravnavam dinamiko spina v časovno spremenljivem polju, kjer za nek čas \textit{T} deluje polje v \textit{z} smeri, nato pa za čas \textit{bT} deluje polje v smeri osi \textit{x}. Za kar napišem program. V katerem simuliram gibanje spina po daljšem času v odvisnosti od parametra \textit{b}.
+V tej domači nalogi raziskujem dinamiko in precesijo spina v časovno spremenljivem polju. Najprej poiščem splošno rešitev za gibanje spina v polju v smeri $x$ in $z$. Nato dinamiko spina v časovno spremenljivem polju, kjer za nek čas $T$ deluje polje v $z$ smeri, nato pa za čas $bT$ deluje polje v smeri osi $x$. Napišem program v katerem simuliram pred tem opisano dinamiko po daljšem času in v odvisnosti od parametra $b$.
 %komentar
-\section{Izpeljava Enačbe}
+\section{Izpeljava enačbe}
+Po razdelku 3.75 iz učbenika \textit{Kvantne in računalniške tehnologije}, kjer je izpeljan Hamiltonov operator za elektronski spin v polju, lahko poiščemo splošno rešitev za gibanje spina če je magneto polje samo v smeri $x$ ali samo v smeri $z$.\\
+Za smer $z$ je v učbeniku izpeljava že prikazana. Podobno naredimo v v smeri $x$:\\
+\begin{equation}
+H = \frac{h\omega}{2}
+\begin{bmatrix}
+0 & 1\\
+1 & 0
+\end{bmatrix}
+\end{equation}\\
+Lastni stanji sta kar $\ket{+}$ in $\ket{-}$ in časovnin razvoj je:
+
+
+\begin{equation}
+\ket{\psi(t)} = \cos\frac{\phi}{2}e^{-i(\phi+\omega_0 t)/2}\ket{+} + \sin\frac{\theta}{2}e^{i(\theta+\omega_0 t)/2}\ket{+}
+\end{equation}\\
+Kroženje(precesija) spina po Blochovi sferi, imenovana tudi \textit{Larmorjeva precesija}, je tako podobno kot, če je polje v smeri $z$.
 
 \section{Časovno odvisno polje}
-
-\subsection{Odvod enačbe}
+Obravnavamo givanje spina v časovno spremenljivem polju. S pomočjo programa, ki bo simuliral spin v kratkih časovnih intervalih in pri tem za čas $T$ uporabljamo enačbo za polje v smeri $z$ in nato za nek čas $bT$ v smeri $x$. 
+\subparagraph{Hipoteza:}
+Predvidevam, da za dovolj majhen $T$ in $b$ (tj. T precej manjši od obhodnega časa), bo rezultat simulacije precesija spina v obliki spirale.
 
 \section{Program za simuliranje}
+Za simuliranje uporabljam programski jezik \textit{python} in module \textit{numpy, matplotlib} ter za simuliranje kvantnih sistemov \textit{qutip}. 
 
 \section{Rezultati simulacije}
 
 \section{Zaključek}
+
+\section{Literatura}
 
 \end{document}
