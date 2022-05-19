@@ -49,22 +49,23 @@ def simulation(b):
     bl.vector_width = 1
     bl.show()
     for i in range(8):  # time rang
-        vecs = []
+        vektorji = []
         while time <= T:
             phi += t*frekvenca
             time += t
             #vec = zPsi(t, phi, theta)  # tukaj plotamo
-            point = [cmath.sin(theta)*cmath.cos(phi), cmath.sin(theta)*cmath.sin(phi), cmath.cos(theta)]
-            vecs.append(point)
-            bl.add_points(point)
+            tocka = [cmath.sin(theta)*cmath.cos(phi), 
+            cmath.sin(theta)*cmath.sin(phi), cmath.cos(theta)]
+            vektorji.append(tocka)
+            bl.add_points(tocka)
             bl.render() 
             zero = input()
 
         time = 0
-        point[1] = 0
-        norm = np.dot(point,point)
-        point /= np.dot(point,point)
-        dot_product = np.dot([1,0,0],point)
+        tocka[1] = 0
+        norm = np.dot(tocka,tocka)
+        tocka /= np.dot(tocka,tocka)
+        dot_product = np.dot([1,0,0],tocka)
         theta = np.arccos(dot_product)
         #print(theta)
         #theta = theta - math.pi/2
@@ -72,7 +73,7 @@ def simulation(b):
         
         #print(math.cos(phi), theta - math.pi/2)
         #print(norm)
-        if(point[2] < 0):
+        if(tocka[2] < 0):
             print(norm)
             phi = math.acos(norm)+math.pi
         else:
@@ -82,32 +83,32 @@ def simulation(b):
         while time <= T*b:
             #za majhne b lahko aproximiramo samo premik 
             #vec = xPsi(t, phi, theta)  # tukaj plotamo izralunaj theta med x osjo (| - > in vectorejm)
-            point = [cmath.cos(theta), cmath.sin(theta)*cmath.sin(phi),  cmath.sin(theta)*cmath.cos(phi)]
-            vecs.append(point)
-            bl.add_points(point)
+            tocka = [cmath.cos(theta), cmath.sin(theta)*cmath.sin(phi),  cmath.sin(theta)*cmath.cos(phi)]
+            vektorji.append(tocka)
+            bl.add_points(tocka)
             bl.render() 
 
             #zero = input()
             phi += t*frekvenca
             time += t
         time = 0
-        point[1] = 0
-        norm = np.dot(point,point)
-        point /= np.dot(point,point)
-        dot_product = np.dot([0,0,1],point)
+        tocka[1] = 0
+        norm = np.dot(tocka,tocka)
+        tocka /= np.dot(tocka,tocka)
+        dot_product = np.dot([0,0,1],tocka)
         theta = np.arccos(dot_product)
         
         print(theta)
 
         print(norm)
-        print(point[0])
+        print(tocka[0])
         print("okol")
-        if(point[0] < 0 or point[1] > 0 ):
+        if(tocka[0] < 0 or tocka[1] > 0 ):
             print("debug")
             phi = math.acos(norm)+math.pi
         else:
             phi = math.acos(norm)
-        #bl.add_states(vecs)
+        #bl.add_states(vektorji)
         bl.render()
         print("okol")
         zero = input()
