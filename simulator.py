@@ -3,13 +3,15 @@ import numpy as np
 import random
 import math
 import cmath
+import time
 from qutip import *
 
 # parametri
-t = 0.05  # časovni interval za meritve
-T = math.pi  # 4*T je trenutno en obhod
-time = theta = phi = 0  # zač. vrednosti
-frekvenca = 1  # frekvenca ni pomembna saj nimamo podane velikosti mag. polje, od katere je odvisna
+t = 0.02 # časovni interval za meritve
+T = 1/4  # 4*T je trenutno en obhod
+theta = math.pi
+time = phi = 0  # zač. vrednosti
+frekvenca = 4*math.pi  # frekvenca ni pomembna saj nimamo podane velikosti mag. polje, od katere je odvisna
 
 # bazni vektorji
 upSpin = basis(2, 0)
@@ -38,30 +40,84 @@ def xPsi(T, phi, theta):
     return Psi(T, plus, minus, phi, theta)
 
 # simulacija v odvisnosti od parametra b
-
-
+#ker je kot relativen na pozicijo baznega vektoraj morem med eno in 
+#drugo simulacije popraviti oba kota 
 def simulation(b):
-    time = phi = theta = 0
-    """b = qutip.Bloch() #za plotanje
-    b.add_states(upSpin)"""
-    for i in range(8):  # time range
+    time = phi = 0
+    theta = 1
+    bl = qutip.Bloch() #za plotanje
+    bl.vector_width = 1
+    bl.show()
+    for i in range(8):  # time rang
+        vecs = []
         while time <= T:
-            vec = zPsi(t, phi, theta)  # tukaj plotamo
-            #b.add_points(vec.full())
+            phi += t*frekvenca
+            time += t
+            #vec = zPsi(t, phi, theta)  # tukaj plotamo
+            point = [cmath.sin(theta)*cmath.cos(phi), cmath.sin(theta)*cmath.sin(phi), cmath.cos(theta)]
+            vecs.append(point)
+            bl.add_points(point)
+            bl.render() 
+            zero = input()
+
+        time = 0
+        point[1] = 0
+        norm = np.dot(point,point)
+        point /= np.dot(point,point)
+        dot_product = np.dot([1,0,0],point)
+        theta = np.arccos(dot_product)
+        #print(theta)
+        #theta = theta - math.pi/2
+        #print(theta)
+        
+        #print(math.cos(phi), theta - math.pi/2)
+        #print(norm)
+        if(point[2] < 0):
+            print(norm)
+            phi = math.acos(norm)+math.pi
+        else:
+            phi = math.acos(norm)
+            
+        #print(phi)
+        while time <= T*b:
+            #za majhne b lahko aproximiramo samo premik 
+            #vec = xPsi(t, phi, theta)  # tukaj plotamo izralunaj theta med x osjo (| - > in vectorejm)
+            point = [cmath.cos(theta), cmath.sin(theta)*cmath.sin(phi),  cmath.sin(theta)*cmath.cos(phi)]
+            vecs.append(point)
+            bl.add_points(point)
+            bl.render() 
+
+            #zero = input()
             phi += t*frekvenca
             time += t
         time = 0
-        while time <= T:
-            vec = xPsi(t*b, phi, theta)  # tukaj plotamo
+        point[1] = 0
+        norm = np.dot(point,point)
+        point /= np.dot(point,point)
+        dot_product = np.dot([0,0,1],point)
+        theta = np.arccos(dot_product)
+        
+        print(theta)
 
-            theta += t*b*frekvenca
-            time += t
-        time=0
-        #b.render()
-        print(vec)
+        print(norm)
+        print(point[0])
+        print("okol")
+        if(point[0] < 0 or point[1] > 0 ):
+            print("debug")
+            phi = math.acos(norm)+math.pi
+        else:
+            phi = math.acos(norm)
+        #bl.add_states(vecs)
+        bl.render()
+        print("okol")
+        zero = input()
+        
 
 
-simulation(0.5)
+
+#b = qutip.Bloch()
+#b.show()
+simulation(0.2)
 """
 phi = 0
 theta = 0
