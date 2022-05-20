@@ -7,8 +7,8 @@ import time
 from qutip import *
 
 # parametri
-t = 0.02 # časovni interval za meritve
-T = 1/4  # 4*T je trenutno en obhod
+t = 0.005 # časovni interval za meritve
+T = 1/20  # 4*T je trenutno en obhod
 theta = math.pi
 time = phi = 0  # zač. vrednosti
 frekvenca = 4*math.pi  # frekvenca ni pomembna saj nimamo podane velikosti mag. polje, od katere je odvisna
@@ -20,7 +20,7 @@ downSpin = basis(2, 1)
 plus = (upSpin + downSpin)/math.sqrt(2)  # | + >
 minus = (upSpin - downSpin)/math.sqrt(2)  # | - >
 
-
+#te metode sedaj  ne igrajo nbene vloge, pustim zavoljo mojega truda :(
 def Psi(T, base1, base2, phi, theta):
     scalar = (-1 * (1j) * (phi + frekvenca * T)) / 2
     n = cmath.cos(theta / 2) * cmath.e ** scalar
@@ -44,94 +44,52 @@ def xPsi(T, phi, theta):
 #drugo simulacije popraviti oba kota 
 def simulation(b):
     time = phi = 0
-    theta = 1
+    theta = math.pi/2
     bl = qutip.Bloch() #za plotanje
-    bl.vector_width = 1
+    bl.vector_width = 2
+    bl.add_states([upSpin, minus])
+    bl.point_color = 'b'
+    bl.point_marker = 'o'
+    bl.point_size = [20]
     bl.show()
-    for i in range(8):  # time rang
-        vektorji = []
+    
+    for i in range(8):  # time range
         while time <= T:
-            phi += t*frekvenca
-            time += t
-            #vec = zPsi(t, phi, theta)  # tukaj plotamo
             tocka = [cmath.sin(theta)*cmath.cos(phi), 
             cmath.sin(theta)*cmath.sin(phi), cmath.cos(theta)]
-            vektorji.append(tocka)
             bl.add_points(tocka)
-            bl.render() 
-            zero = input()
-
-        time = 0
-        tocka[1] = 0
-        norm = np.dot(tocka,tocka)
-        tocka /= np.dot(tocka,tocka)
-        dot_product = np.dot([1,0,0],tocka)
-        theta = np.arccos(dot_product)
-        #print(theta)
-        #theta = theta - math.pi/2
-        #print(theta)
-        
-        #print(math.cos(phi), theta - math.pi/2)
-        #print(norm)
-        if(tocka[2] < 0):
-            print(norm)
-            phi = math.acos(norm)+math.pi
-        else:
-            phi = math.acos(norm)
-            
-        #print(phi)
-        while time <= T*b:
-            #za majhne b lahko aproximiramo samo premik 
-            #vec = xPsi(t, phi, theta)  # tukaj plotamo izralunaj theta med x osjo (| - > in vectorejm)
-            tocka = [cmath.cos(theta), cmath.sin(theta)*cmath.sin(phi),  cmath.sin(theta)*cmath.cos(phi)]
-            vektorji.append(tocka)
-            bl.add_points(tocka)
-            bl.render() 
-
-            #zero = input()
             phi += t*frekvenca
             time += t
+
         time = 0
-        tocka[1] = 0
-        norm = np.dot(tocka,tocka)
-        tocka /= np.dot(tocka,tocka)
-        dot_product = np.dot([0,0,1],tocka)
-        theta = np.arccos(dot_product)
+        phiOld = phi
+        thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
+        phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
+        theta = thetaNew
+
+        #popravek, v dolocenih primerih
+        if(phiOld.real > math.pi+0.2):
+            phi =2*math.pi-phi
+
+        while time <= T*b:
+            tocka = [cmath.cos(theta), cmath.sin(theta)*cmath.sin(phi),  cmath.sin(theta)*cmath.cos(phi)]
+            bl.add_points(tocka)
+            phi += (t*frekvenca)
+            time += t
+
+        time = 0
+        phiOld = phi
+        thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
+        phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
+        theta = thetaNew
+        if(phiOld.real > math.pi+0.2):
+            phi =2*math.pi-phi
+
+    bl.render()
         
-        print(theta)
-
-        print(norm)
-        print(tocka[0])
-        print("okol")
-        if(tocka[0] < 0 or tocka[1] > 0 ):
-            print("debug")
-            phi = math.acos(norm)+math.pi
-        else:
-            phi = math.acos(norm)
-        #bl.add_states(vektorji)
-        bl.render()
-        print("okol")
-        zero = input()
-        
-
-
-
-#b = qutip.Bloch()
-#b.show()
-simulation(0.2)
-"""
-phi = 0
-theta = 0
-b = 0.5
-for i in range(4):
-  #vec = zPsi(T, phi,theta)
-  #phi+=T*frekvenca
-  vec = xPsi(T*b, phi, theta)
-  theta+=T*b*frekvenca
-
-print(vec)
+#generiranje b-jev
 for i in range(5):
-  b = random.randint(0, 100)/100
-  print("pri b =", b, "je simulacije taka:")
-  simulation(b)
-"""
+    b = random.randint(1, 1000)/1000
+    print("Pri parametru b =", b, ",je simulacije taka: ")
+    simulation(b)
+zero = input() #da se program ustavi, da lahko pogledam rezultate
