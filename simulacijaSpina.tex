@@ -19,9 +19,9 @@
 \newpage
 
 \section{Uvod}
-V tej domači nalogi raziskujem dinamiko in precesijo spina v časovno spremenljivem polju. Najprej poiščem splošno rešitev za gibanje spina v polju v smeri $x$ in $z$. Nato dinamiko spina v časovno spremenljivem polju, kjer za nek čas $T$ deluje polje v $z$ smeri, nato pa za čas $bT$ deluje polje v smeri osi $x$. Napišem program v katerem simuliram pred tem opisano dinamiko po daljšem času in v odvisnosti od parametra $b$.
+V domači nalogi raziskujem dinamiko in precesijo spina v časovno spremenljivem polju. Najprej poiščem splošno rešitev za gibanje spina v polju v smeri $x$ in $z$. Nato dinamiko spina v časovno spremenljivem polju, kjer za nek čas $T$ deluje polje v $z$ smeri, nato pa za čas $bT$ deluje polje v smeri osi $x$. Napišem program v katerem simuliram pred tem opisano dinamiko po daljšem času in v odvisnosti od parametra $b$.
 
-Celotna izvorna koda simulatorja in tudi tex od domače naloge se nahaja na repozitorju: \url{https://github.com/copandrej/Simulacija-spina} 
+Celotna izvorna koda simulatorja in tudi \textit{.tex} od domače naloge se nahaja na repozitorju: \url{https://github.com/copandrej/Simulacija-spina} 
 %komentar
 \section{Izpeljava enačbe}
 Po razdelku 3.75 iz učbenika \textit{Kvantne in računalniške tehnologije}, kjer je izpeljan Hamiltonov operator za elektronski spin v polju, lahko poiščemo splošno rešitev za gibanje spina če je magneto polje samo v smeri $x$ ali samo v smeri $z$.\\
@@ -52,9 +52,10 @@ Najprej nastavimo parametre in bazne vektorje:
 \lstset{language=Python} 
 \begin{lstlisting}
 	t = 0.05
-	T = math.pi
-	time = theta = phi = 0
-	frekvenca = 1 
+	T = 1/20
+	theta = 1
+	time = phi = 0
+	frekvenca = 4*math.pi 
 
 	upSpin = basis(2, 0)
 	downSpin = basis(2, 1)
@@ -67,39 +68,51 @@ Kljub večkratnim poiskusom nisem uspešno implementiral enačbe (2) v program, 
 	tocka = [cmath.sin(theta)*cmath.cos(phi), 
 	cmath.sin(theta)*cmath.sin(phi), cmath.cos(theta)]
 \end{lstlisting}
+In vektor za polje v smeri $x$:
+\begin{lstlisting}
+	tocka = [cmath.cos(theta),cmath.sin(theta)*cmath.sin(phi),
+	cmath.sin(theta)*cmath.cos(phi)]
+\end{lstlisting}
 Koordinate periodično označujem na Blochovi sferi:
 \begin{lstlisting}
 	bl = qutip.Bloch()
-	vektorji = []
 		#v zanki	
-		vektorji.append(tocka)
-	bl.add_points(vektorji)
+		bl.add_points(tocka)
     	bl.render() 
 \end{lstlisting}
 Zanko poganjam na majhnih časovnih intervalih in pri tem posodabljam \textit{phi} in \textit{theta}: $\phi(t) = \phi + \omega_0t$
 Med spreminjanjem smeri magnetnega polja posodobim kote $phi$ in $theta$ na zamenjana bazna vektorja z programom:
 \begin{lstlisting}
-	tocka[1] = 0
-	norm = np.dot(tocka,tocka)
-	tocka /= np.dot(tocka,tocka)
-	dot_product = np.dot([1,0,0],tocka)
-	theta = np.arccos(dot_product)
-	phi = math.acos(norm)+math.pi 
+	phiOld = phi
+    	thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
+    	phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
+    	theta = thetaNew
 \end{lstlisting}
-\newpage
 \section{Rezultati simulacije}
 Primer simulacije precesije spina, ko je magnetno polje v smeri $z$ in kot $theta$ poljubno nastavljen:
 \begin{figure}[H]
-  \includegraphics[width=500pt]{slike/precesija_po_osi_z}
+  \includegraphics[width=350pt]{slike/precesija_po_osi_z}
   \caption{Precesija spina, po magnetnem polju v smeri $z$}
   \label{fig:boat1}
 \end{figure}
-Primer simulacije pri časovno odvisnem polju, kot opisano v prejšnih razdelkih:
+Primer simulacije pri časovno odvisnem polju, kot opisano v prejšnih razdelkih. Smer magnetnega polja je označena z vektorji in smer spina z pikami. Zaradi programske napake, je vektor magnetnega polja usmerjen v $-x$. To zgolj obrne smer precesije okoli osi $x$.
+\begin{figure}[H]
+	\includegraphics[width=350pt]{slike/b=06.png}
+	\caption{Parameter $b = 0.6$ }
+	\label{fig:boat1}
+\end{figure}
+Pri malem parametru $b$
+\begin{figure}[H]
+	\includegraphics[width=400pt]{slike/precesija_v_cas}
+	\caption{Parameter $b < 0.1$ }
+	\label{fig:boat1}
+  \end{figure}
+Še več slik simulacije si je možno ogledati na zgoraj omenjenem repositoriju.
 \section{Ugotovitve in zaključek}
-Iz te simulacije lahko zaključimo, da se precesija spina podobno kot precesija vrtavke, z dodatno možnostjo časovno odvisnega magnetnega polja. Z spreminjanjem magnetnega polja in parametrov simulaciej lahko "pokrijemo" celotno Blochovo sfero.
+Iz te simulacije lahko zaključimo, da se precesija spina podobno kot precesija vrtavke, z dodatno možnostjo časovno odvisnega magnetnega polja. Z spreminjanjem magnetnega polja in parametrov simulacije lahko "pokrijemo" celotno Blochovo sfero. Hipoteza, postavljena v razdelku 3. je bila napačna, ker nisem pravilno upošteval spremembo precesije ob spremembi predznaka $y$ koordinate(v klasičnem smislu, na Blochovi sferi)
 
 Domača naloga je bila poučna predvsem iz smeri reševanja problemov in je pokazala, da zelo slabo pozanam ta področje, saj se je zalomilo že pri najbolj osnovnih izpeljavah in programiranju.
 
 \section{Literatura}
-
+Rok Žitko: \textit{Kvantne in računalniške tehnologije}, DMFA - založništvo, 2017.
 \end{document}
