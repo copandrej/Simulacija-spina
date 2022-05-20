@@ -8,10 +8,12 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage{minted}
 \author{Andrej Čop}
 \date{Maj 2022}
 
 \begin{document}
+
 \maketitle
 \newpage
 
@@ -19,13 +21,13 @@
 \newpage
 
 \section{Uvod}
-V domači nalogi raziskujem dinamiko in precesijo spina v časovno spremenljivem polju. Najprej poiščem splošno rešitev za gibanje spina v polju v smeri $x$ in $z$. Nato dinamiko spina v časovno spremenljivem polju, kjer za nek čas $T$ deluje polje v $z$ smeri, nato pa za čas $bT$ deluje polje v smeri osi $x$. Napišem program v katerem simuliram pred tem opisano dinamiko po daljšem času in v odvisnosti od parametra $b$.
+V domači nalogi raziskujem dinamiko in precesijo spina elektrona v časovno spremenljivem polju. Najprej poiščem splošno rešitev za gibanje spina v polju v smeri $x$ in $z$. Nato dinamiko spina v časovno spremenljivem polju, kjer za nek čas $T$ deluje polje v $z$ smeri, nato pa za čas $bT$ deluje polje v smeri osi $x$. Napišem program v katerem simuliram pred tem opisano dinamiko po daljšem času in v odvisnosti od parametra $b$.
 
 Celotna izvorna koda simulatorja in tudi \textit{.tex} od domače naloge se nahaja na repozitorju: \url{https://github.com/copandrej/Simulacija-spina} 
 %komentar
 \section{Izpeljava enačbe}
-Po razdelku 3.75 iz učbenika \textit{Kvantne in računalniške tehnologije}, kjer je izpeljan Hamiltonov operator za elektronski spin v polju, lahko poiščemo splošno rešitev za gibanje spina če je magneto polje samo v smeri $x$ ali samo v smeri $z$.\\
-Za smer $z$ je v učbeniku izpeljava že prikazana. Podobno naredimo v v smeri $x$:\\
+Po razdelku 3.75 iz učbenika \textit{Kvantne in računalniške tehnologije}, kjer je izpeljan Hamiltonov operator za elektronski spin v polju, lahko poiščemo splošno rešitev za gibanje spina, če je magnetno polje samo v smeri $x$ ali samo v smeri $z$.\\
+Za smer $z$ je v učbeniku izpeljava že prikazana. Podobno naredimo v smeri $x$:\\
 \begin{equation}
 H = \frac{h\omega}{2}
 \begin{bmatrix}
@@ -41,6 +43,21 @@ Lastni stanji sta kar $\ket{+}$ in $\ket{-}$ in časovnin razvoj je:
 \end{equation}\\
 Kroženje(precesija) spina po \textit{Blochovi sferi}, imenovana tudi \textit{Larmorjeva precesija}, je tako podobna kot, če je polje v smeri $z$.
 
+Enako po zgledu iz učbenika izpeljemo pričakovane vrednosti operatorjev spina za polje v smeri osi x in baznimi vektorji $\ket{+},\ket{-}$.
+\begin{equation}
+\braket{S_x} = \cos(\theta)$$$$
+\braket{S_y} = \sin(\theta)\sin(\phi+\omega_0t)$$$$
+\braket{S_z} = \sin(\theta)\cos(\phi+\omega_0t)
+\end{equation}
+
+S pomočjo teh enačb(in enačbo pri magnetnem polju v smer $z$) lahko izpeljemo kako se kot sprememni med menjavo baznih vektorjev (za potrebe simulacije):
+\begin{equation}
+\cos(\theta') = \sin(\theta)\sin(\phi)$$$$
+\sin(\theta')\sin(\phi') = \cos(\theta)$$$$
+\sin(\phi') = \frac{\cos(\theta)}{\sin(\theta')}
+\end{equation}
+Pri čemer sta $\theta'$ in $\phi'$ nova kota.
+
 \section{Časovno odvisno polje}
 Obravnavamo gibanje spina v časovno spremenljivem polju. S pomočjo programa, ki bo simuliral spin v kratkih časovnih intervalih in pri tem za čas $T$ uporabljamo enačbo za polje v smeri $z$ in nato za nek čas $bT$ v smeri $x$. 
 \subparagraph{Hipoteza:}
@@ -50,7 +67,7 @@ Predvidevam, da za dovolj majhen $T$ in $b$ (tj. T precej manjši od obhodnega �
 Za simuliranje uporabljam programski jezik \textit{python} in module \textit{numpy, matplotlib}, \textit{cmath}, ter za simuliranje kvantnih sistemov in prikazovanje na Blochovi sferi \textit{qutip}.\\
 Najprej nastavimo parametre in bazne vektorje:
 \lstset{language=Python} 
-\begin{lstlisting}
+\begin{minted}{Python}
 	t = 0.05
 	T = 1/20
 	theta = 1
@@ -62,40 +79,40 @@ Najprej nastavimo parametre in bazne vektorje:
 
 	plus = (upSpin + downSpin)/math.sqrt(2)  # | + >
 	minus = (upSpin - downSpin)/math.sqrt(2)  # | - >
-\end{lstlisting}
-Kljub večkratnim poiskusom nisem uspešno implementiral enačbe (2) v program, zato v nadaljevanju uporabljam koordinate Blochove sfere, ki jih izračunamo kot pričakovane vrednosti:
-\begin{lstlisting}
+\end{minted}
+Kljub večkratnim poizkusom nisem uspešno implementiral enačbe (2) v program, zato v nadaljevanju uporabljam koordinate Blochove sfere, ki jih izračunamo kot pričakovane vrednosti po enačbah (3):
+\begin{minted}{Python}
 	tocka = [cmath.sin(theta)*cmath.cos(phi), 
 	cmath.sin(theta)*cmath.sin(phi), cmath.cos(theta)]
-\end{lstlisting}
+\end{minted}
 In vektor za polje v smeri $x$:
-\begin{lstlisting}
+\begin{minted}{Python}
 	tocka = [cmath.cos(theta),cmath.sin(theta)*cmath.sin(phi),
 	cmath.sin(theta)*cmath.cos(phi)]
-\end{lstlisting}
+\end{minted}
 Koordinate periodično označujem na Blochovi sferi:
-\begin{lstlisting}
+\begin{minted}{Python}
 	bl = qutip.Bloch()
-		#v zanki	
-		bl.add_points(tocka)
-    	bl.render() 
-\end{lstlisting}
+	  #v zanki	
+	  bl.add_points(tocka)
+	bl.render() 
+\end{minted}
 Zanko poganjam na majhnih časovnih intervalih in pri tem posodabljam \textit{phi} in \textit{theta}: $\phi(t) = \phi + \omega_0t$
-Med spreminjanjem smeri magnetnega polja posodobim kote $phi$ in $theta$ na zamenjana bazna vektorja z programom:
-\begin{lstlisting}
+Med spreminjanjem smeri magnetnega polja posodobim kote $phi$ in $theta$ na zamenjana bazna vektorja po enačbah (4) z programom:
+\begin{minted}{Python}
 	phiOld = phi
-    	thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
-    	phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
-    	theta = thetaNew
-\end{lstlisting}
+	thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
+	phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
+	theta = thetaNew
+\end{minted}
 \section{Rezultati simulacije}
 Primer simulacije precesije spina, ko je magnetno polje v smeri $z$ in kot $theta$ poljubno nastavljen:
 \begin{figure}[H]
-  \includegraphics[width=350pt]{slike/precesija_po_osi_z}
+  \includegraphics[width=350pt]{slike/precesija_po_osi_z.png}
   \caption{Precesija spina, po magnetnem polju v smeri $z$}
   \label{fig:boat1}
 \end{figure}
-Primer simulacije pri časovno odvisnem polju, kot opisano v prejšnih razdelkih. Smer magnetnega polja je označena z vektorji in smer spina z pikami. Zaradi programske napake, je vektor magnetnega polja usmerjen v $-x$. To zgolj obrne smer precesije okoli osi $x$.
+Primer simulacije pri časovno odvisnem polju, kot opisano v prejšnjih razdelkih. Smer magnetnega polja je označena z vektorji in smer spina z pikami. Zaradi programske napake, je vektor magnetnega polja usmerjen v $-x$. To zgolj obrne smer precesije okoli osi $x$.
 \begin{figure}[H]
 	\includegraphics[width=350pt]{slike/b=06.png}
 	\caption{Parameter $b = 0.6$ }
@@ -111,7 +128,7 @@ Pri malem parametru $b$
 \section{Ugotovitve in zaključek}
 Iz te simulacije lahko zaključimo, da se precesija spina podobno kot precesija vrtavke, z dodatno možnostjo časovno odvisnega magnetnega polja. Z spreminjanjem magnetnega polja in parametrov simulacije lahko "pokrijemo" celotno Blochovo sfero. Hipoteza, postavljena v razdelku 3. je bila napačna, ker nisem pravilno upošteval spremembo precesije ob spremembi predznaka $y$ koordinate(v klasičnem smislu, na Blochovi sferi)
 
-Domača naloga je bila poučna predvsem iz smeri reševanja problemov in je pokazala, da zelo slabo pozanam ta področje, saj se je zalomilo že pri najbolj osnovnih izpeljavah in programiranju.
+Domača naloga je bila poučna predvsem iz smeri reševanja problemov in je pokazala, da zelo slabo poznam ta področje, saj se je zalomilo že pri najbolj osnovnih izpeljavah in programiranju.
 
 \section{Literatura}
 Rok Žitko: \textit{Kvantne in računalniške tehnologije}, DMFA - založništvo, 2017.
