@@ -39,6 +39,13 @@ def zPsi(T, phi, theta):
 def xPsi(T, phi, theta):
     return Psi(T, plus, minus, phi, theta)
 
+def pretvoriBazo(theta, phi):
+    scalar = (1j * phi / 2)
+    n = 1/cmath.sqrt(2)*((cmath.cos(theta / 2) * cmath.e ** (-1*scalar)) + (cmath.sin(theta / 2) * cmath.e ** scalar))
+    theta = cmath.acos(cmath.polar(n)[0])*2
+    phi = cmath.polar(n)[1]*2
+    return (theta, phi)
+
 # simulacija v odvisnosti od parametra b
 #ker je kot relativen na pozicijo baznega vektoraj morem med eno in 
 #drugo simulacije popraviti oba kota 
@@ -62,15 +69,18 @@ def simulation(b):
             time += t
 
         time = 0
+        """
         phiOld = phi
         thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
         phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
         theta = thetaNew
 
+
         #popravek, v dolocenih primerih
         if(phiOld.real > math.pi+0.2):
             phi =2*math.pi-phi
-
+        """
+        (theta, phi) = pretvoriBazo(theta, phi)
         while time <= T*b:
             tocka = [cmath.cos(theta), cmath.sin(theta)*cmath.sin(phi),  cmath.sin(theta)*cmath.cos(phi)]
             bl.add_points(tocka)
@@ -78,12 +88,13 @@ def simulation(b):
             time += t
 
         time = 0
-        phiOld = phi
+        (theta, phi) = pretvoriBazo(theta, phi)
+        """phiOld = phi
         thetaNew = cmath.acos(cmath.sin(theta)*cmath.cos(phi))
         phi = cmath.acos(cmath.cos(theta)/cmath.sin(thetaNew))
         theta = thetaNew
         if(phiOld.real > math.pi+0.2):
-            phi =2*math.pi-phi
+            phi =2*math.pi-phi"""
 
     bl.render()
         
